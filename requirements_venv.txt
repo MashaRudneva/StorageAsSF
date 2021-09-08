@@ -1,0 +1,14 @@
+
+Django==3.1.5
+#django-utils-six==2.0
+
+git+https://gitlab.tudelft.nl/mheijink/django-suit.git
+
+
+django-debug-toolbar==3.1.1
+
+whitenoise==5.2.0
+djangorestframework==3.12.2
+
+django-utils-six==2.0
+
