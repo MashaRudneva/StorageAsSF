@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+
+
+{% load static %}
+<link rel="stylesheet" href="{% static "details.css" %}" type="text/css" charset="utf-8">
+
+
+<html class="no-js twentytwenty ">
+
+<head>
+
+	<title>TUDelft</title>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+
+<body>
+	<div>
+		<div id="curtain" class="curtain is-hidden "></div>
+
+		<main id="main" role="main">
+
+			<article class="article">
+
+				<div class="panel panel--content panel--heading">
+					<div class="panel__body">
+						<h1 id="page-title" class="article__title">{{ package.name}}</h1>
+						{% if pilot %}
+						<h2 id="page-title" style="color: red;">This is a pilot environment<br/>Not the official environment</h2>
+						{% endif %}
+					</div>
+				</div>
+
+				<div class="panel panel--content panel--grid-content panel--article-body">
+					<div class="panel__body">
+
+						<div class="content content--main">
+
+							<div class="article__lead">
+								<p>{{ package.description}}</p>
+							</div>
+
+							<div class="article__content">
+								<h2>Description</h2>
+								<p>{{ package.functionality | safe }}</p>
+								<h2>Max.storage size</h2>
+								<p>{{ package.help | safe }}</p>
+								<h2>Cost</h2>
+								<p>{{ package.cost | safe }}</p>
+								<h2>Sharing and collaboration </h2>
+								<p>{{ package.terms | safe }}</p>
+								<h2>Stored at </h2>
+								<p>{{ package.terms | safe }}</p>
+								<h2>Availability </h2>
+								<p>{{ package.terms | safe }}</p>
+								<h2>Security </h2>
+								<p>{{ package.terms | safe }}</p>
+								<h2>Versioning </h2>
+								<p>{{ package.terms | safe }}</p>
+								<h2>Get started </h2>
+								<p>{{ package.terms | safe }}</p>
+
+							</div>
+
+						</div>
+
+						<aside class="content content--aside content--aside-bottom">
+							<nav role="navigation" aria-labelledby="link-listing__title--get-in-touch">
+								<h2 class="link-listing__title" id="link-listing__title--get-in-touch">Get in touch</h2>
+								<ul class="link-listing">
+									<li class="link-listing__item">
+										<a target="_blank" href="{{  recommend_link }}">Recommend Storage</a>
+									</li>
+									<li class="link-listing__item">
+										<a target="_blank" href="{{ feedback }}">Feedback on storage finder</a>
+									</li>
+								</ul>
+									</nav>
+
+                                {% if package.logo %}
+                                <figure class="figure figure--aside">
+                                    {% if package.url %}
+                                    <a href="{{ package.url}}" target="_blank"><img src="/media/{{ package.logo}}" class="card__image"></a>
+                                    {% else %}
+                                    <img src="/media/{{ package.logo}}" class="card__image">
+                                    {% endif %}
+                                </figure>
+                                {% endif %}
+							<br/>
+							<div class="info-sidebar">
+
+								<div class="info-sidebar__group">
+									<h2 class="info-sidebar__title">Max. storage size</h2>
+									<ul class="bullet-list">
+
+										{% for pl in package.platforms.all %}
+											<li class="info-sidebar__item">{{ pl}}</li>
+										{% endfor %}
+
+									</ul>
+								</div>
+
+								{% if package.support%}
+								<div class="info-sidebar__group">
+									<h2 class="info-sidebar__title">Support</h2>
+									<ul class="bullet-list">
+										<li class="info-sidebar__item">{{ package.support}}</li>
+									</ul>
+								</div>
+								{% endif%}
+
+
+
+							</div>
+						</aside>
+					</div>
+				</div>
+			</article>
+		</main>
+</body>
+</html>

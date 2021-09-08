@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static "main.css" %}" type="text/css" charset="utf-8">
+
+    <link rel="stylesheet" href="{% static "jquery.multiselect.css" %}" type="text/css" charset="utf-8">
+	<script src="{% static "jquery.multiselect.js" %}" type="text/javascript" charset="utf-8"></script>
+
+
+    <style>
+        .rounded {
+            border-radius:7px !important;
+        }
+
+        .clear_btn {
+            background-color:#05345c;
+            color: white;
+        }
+
+
+        .clear_btn:hover {
+            background-color: #35665d !important;
+            color: white;
+        }
+
+
+    </style>
+
+    <script>
+
+
+        function style_multi_select() {
+            var btn = $('#ms-list-1 > button');
+
+            btn.width('250px');
+
+            btn = $('#ms-list-2 > button');
+
+            btn.width('250px');
+
+            btn = $('#ms-list-3 > button');
+            btn.width('250px');
+
+            var div = $('#ms-list-3 > div');
+            div.css('min-height', '100px');
+
+            $(":button").addClass("rounded");
+        };
+
+
+
+        function clear_filters() {
+
+            $('select[multiple]').multiselect( 'reset' );
+
+            style_multi_select();
+
+            filter_packages();
+        };
+
+
+
+        function toIntArray( rg) {
+            for ( var n = 0; n < rg.length; n++) {
+                rg[n] = parseInt(rg[n]);
+            }
+            return rg;
+        }
+
+        function allowedByArray( rg, package_rg) {
+            if ( rg.length === 0 ) {
+                return true;
+            }
+            for ( var n = 0; n < rg.length; n++) {
+                var value = rg[n];
+
+                if (package_rg.includes(value)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+        function filter_packages() {
+
+            var categories = toIntArray ( $('.categories-search').val() );
+            var devices = toIntArray ( $('.devices-search').val() );
+            var roles = toIntArray ( $('.role-search').val() );
+
+            var value = $("#tool_filter").val().toLowerCase();
+
+            $('#id_nothing_found').show();
+
+
+            $("#id_package_list a").filter(function () {
+
+                var title = $(this).find('h3').text().toLowerCase();
+                var desc = $(this).find('div').text().toLowerCase();
+                // console.log("title", title );
+                // console.log("desc",  desc);
+
+                var href = $(this);
+
+                var device = href.data("plat");
+                var cat = href.data("cat");
+                var role = href.data("role");
+
+                var show = allowedByArray( categories, cat );
+
+                if ( show) {
+                    show = allowedByArray( devices, device );
+                }
+
+                if ( show) {
+                    show = allowedByArray( roles, role );
+                }
+
+
+                if ( show) {
+                    // only title or description can hide it now
+                    show = title.indexOf(value) > -1 || desc.indexOf(value) > -1;
+                }
+
+                href.toggle(show);
+
+                if (show) {
+                    $('#id_nothing_found').hide();
+                }
+
+            });
+
+        };
+
+
+        $(document).ready(function () {
+            $("#tool_filter").on("keyup", filter_packages);
+            $(".categories-search").on("change", filter_packages);
+            $(".devices-search").on("change", filter_packages);
+            $(".role-search").on("change", filter_packages);
+
+            filter_packages();
+
+
+            $('#id_select_categories').multiselect();
+            $('#id_select_devices').multiselect();
+            $('#id_select_roles').multiselect();
+            $('#id_select_confidential').multiselect();
+            $('#id_select_version').multiselect();
+
+            style_multi_select();
+
+            $('#tool_filter').addClass("rounded");
+
+
+        });
+    </script>
+
+</head>
+
+
+<body>
+
+
+    <div class="panel panel--content panel--heading">
+        <div class="panel__body" style="padding-top: 2rem;">
+            <h1 id="page-title">Storage Finder TUDelft</h1>
+            {% if pilot %}
+            <h2 id="page-title" style="color: red;">This is a pilot environment<br/>Not the official environment</h2>
+            {% endif %}
+        </div>
+    </div>
+    <div class="panel panel--content panel--grid-content panel--article-body">
+        <div class="panel__body">
+            <div class="content content--main">
+                <div class="lead">{{subtitle_homepage |safe }}</div>
+            </div>
+            <aside class="content content--aside content--aside-bottom">
+                <nav role="navigation" aria-labelledby="link-listing__title--get-in-touch">
+                    <h2 class="link-listing__title" id="link-listing__title--get-in-touch">Get in touch</h2>
+
+                        <ul class="link-listing">
+                            <li class="link-listing__item">
+                                <a target="_blank" href="{{  recommend_link }}">Recommend Storage</a>
+                            </li>
+                            <li class="link-listing__item">
+                                <a target="_blank" href="{{ feedback }}">Feedback on storage finder</a>
+                            </li>
+                        </ul>
+                </nav>
+            </aside>
+        </div>
+    </div>
+
+
+
+<section class="panel panel--content panel--secondary panel--listing">
+    <div class="panel__body" style="padding-top: 0rem;">
+        <div class="filter">
+            <div id="filter__categories" class="filter__categories">
+                <div class="filter__select">
+
+                    <label>What kind of data do you want to store?</label>
+                    <select aria-label="categories" id="id_select_categories" class="categories-search form-control" multiple="multiple" style="min-width:250px">
+                        <!-- <option value="-1"></option> -->
+
+                        {% for b in category %}
+                        <option value="{{ b.id }}">{{ b.name }}</option>
+                        {% endfor %}
+                        </select>
+                </div>
+
+                <div class="filter__select">
+                    <label>What will be the total amount of the data?</label>
+                    <select aria-label="device type" id="id_select_devices" class="devices-search form-control" multiple="multiple" style="min-width:250px">
+                        <!-- <option value="-1"></option> -->
+                        {% for b in platform %}
+                        <option value="{{ b.id }}">{{ b.name }}</option>
+                        {% endfor %}
+                        </select>
+                </div>
+
+
+                <div class="filter__select">
+                    <label>Do you want to share data with colleagues?</label>
+                    <select aria-label="commonly used by" id="id_select_roles" class="role-search form-control" multiple="multiple" style="min-width:250px; min-height: 100px !important;">
+                        <!-- <option value="-1"></option> -->
+                        {% for b in domain %}
+                        <option value="{{ b.id }}">{{ b.name }}</option>
+                        {% endfor %}
+                        </select>
+                    </select>
+                </div>
+
+
+				<div class="filter__select">
+                    <label>What is the classification of the data regarding confidentiality?</label>
+                    <select aria-label="confidentiality" id="id_select_confidential" class="role-search form-control" multiple="multiple" style="min-width:250px; min-height: 100px !important;">
+                        <!-- <option value="-1"></option> -->
+                        {% for b in domain %}
+                        <option value="{{ b.id }}">{{ b.name }}</option>
+                        {% endfor %}
+                        </select>
+                    </select>
+                </div>
+
+				<div class="filter__select">
+                    <label>Do you want to be able to access previous versions of the data yourself?</label>
+                    <select aria-label="version control" id="id_select_version" class="role-search form-control" multiple="multiple" style="min-width:250px; min-height: 100px !important;">
+                        <!-- <option value="-1"></option> -->
+                        {% for b in domain %}
+                        <option value="{{ b.id }}">{{ b.name }}</option>
+                        {% endfor %}
+                        </select>
+                    </select>
+                </div>
+
+
+                <div class="filter__select">
+                    <h3>&nbsp;</h3>
+                    <button type="button" class="clear_btn role-search form-control"  onclick="clear_filters()">Clear filters</button>
+                </div>
+            </div>
+            <div class="filter__input">
+                <div class="filter__box">
+                    <input id="tool_filter" type="text" placeholder="Filter tools by title or description" aria-controls="tool-results" autocomplete="off" class="form-control">
+                </div>
+            </div>
+
+            <div id="filter__categories" class="filter__categories">
+                <div class="filter__select">
+                    <div id="id_nothing_found">Nothing found, reset your filters</div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</section>
+
+
+
+
+    <div class="container">
+        <section class="panel panel--content panel--spaced panel--tight panel--secondary">
+            <div class="panel__body">
+                <div id="tool-results" class="content content--card" style="display: block;">
+
+                    <ul id="id_package_list" class="quickspot-inline-results">
+
+                        {% for s in storage %}
+                        <li class="quickspot-inline-result">
+                            <a href="/package/{{ s.id}}" data-cat="{{ s.cat }}" data-plat="{{ s.plat }}" data-role="{{ s.role}}" class="card card--backed-white card--horizontal card--profile u-chevron">
+                                <img src="/media/{{ s.logo}}" class="card__image">
+
+
+
+                                <div class="card__details" >
+                                    <h3 class="card__title">{{ s.name }}</h3>
+                                    <div class="card__description">{{ s.description}}</div>
+                                </div>
+                            </a>
+                        </li>
+                        {% endfor %}
+
+
+                    </ul>
+                </div>
+
+
+                <div>
+            </div>
+        </section>
+    </div>
+
+
+
+
+
+</body>
+</html>
